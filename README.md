@@ -154,13 +154,13 @@ GET /dashboard/monthlywise
 ### 1. Clone the repository
 
 ```
-git clone https://github.com/yourusername/finance-dashboard-backend.git
+git clone https://github.com/arvindshs/Finance_Dashboard.git
 ```
 
 ### 2. Navigate to the project directory
 
 ```
-cd finance-dashboard-backend
+cd Finance_Dashboard
 ```
 
 ### 3. Configure the database
