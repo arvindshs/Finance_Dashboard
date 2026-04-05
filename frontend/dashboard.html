@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zorvyn Finance — Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            color: #111;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 200px;
+            background: #222;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+        }
+
+        .sidebar-top {
+            padding: 1.2rem 1rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .sidebar-brand {
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .sidebar-user {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .sidebar-role {
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        .role-ADMIN {
+            color: #6dbf8a;
+        }
+
+        .role-ANALYST {
+            color: #7eb8d4;
+        }
+
+        .role-VIEWER {
+            color: #c4b896;
+        }
+
+        nav {
+            flex: 1;
+            padding: 0.75rem 0;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 10px 1rem;
+            font-size: 13px;
+            color: #aaa;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: #333;
+            color: #fff;
+            border-left-color: #6dbf8a;
+        }
+
+        .sidebar-bottom {
+            padding: 1rem;
+            border-top: 1px solid #333;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 8px;
+            background: transparent;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #888;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .btn-logout:hover {
+            border-color: #888;
+            color: #ccc;
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: 200px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            padding: 0 1.5rem;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar h1 {
+            font-size: 15px;
+            font-weight: bold;
+            color: #111;
+        }
+
+        .content {
+            padding: 1.5rem;
+        }
+
+        /* METRICS */
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 1rem;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .metric-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .metric-value.green {
+            color: #1a5c35;
+        }
+
+        .metric-value.red {
+            color: #8b2020;
+        }
+
+        .metric-value.blue {
+            color: #1a3a6a;
+        }
+
+        /* CARD */
+        .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            text-align: left;
+            padding: 0 0 8px;
+            font-size: 12px;
+            color: #888;
+            border-bottom: 1px solid #eee;
+        }
+
+        td {
+            padding: 9px 0;
+            border-bottom: 1px solid #f0f0f0;
+            color: #111;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .tag-income {
+            background: #e8f5ee;
+            color: #1a5c35;
+        }
+
+        .tag-expense {
+            background: #fdf0f0;
+            color: #8b2020;
+        }
+
+        .tag-admin {
+            background: #e8f5ee;
+            color: #1a5c35;
+        }
+
+        .tag-analyst {
+            background: #e8f0f8;
+            color: #1a3a5c;
+        }
+
+        .tag-viewer {
+            background: #f5f2e8;
+            color: #5c5040;
+        }
+
+        .amt-income {
+            color: #1a5c35;
+            font-weight: bold;
+        }
+
+        .amt-expense {
+            color: #8b2020;
+            font-weight: bold;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 7px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background: #fff;
+            color: #333;
+        }
+
+        .btn:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-dark {
+            background: #222;
+            color: #fff;
+            border-color: #222;
+        }
+
+        .btn-dark:hover {
+            background: #444;
+            border-color: #444;
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 12px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .btn-edit {
+            background: #fff;
+            border: 1px solid #bbb;
+            color: #333;
+        }
+
+        .btn-edit:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-delete {
+            background: #fff;
+            border: 1px solid #f5c0c0;
+            color: #c00;
+        }
+
+        .btn-delete:hover {
+            background: #fff5f5;
+        }
+
+        /* MODAL */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 6px;
+            padding: 1.5rem;
+            width: 420px;
+            max-width: 90vw;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal h3 {
+            font-size: 15px;
+            margin-bottom: 1.25rem;
+            color: #111;
+        }
+
+        .form-row {
+            margin-bottom: 0.9rem;
+        }
+
+        .form-row label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .form-row input,
+        .form-row select,
+        .form-row textarea {
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 13px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-row input:focus,
+        .form-row select:focus,
+        .form-row textarea:focus {
+            border-color: #555;
+        }
+
+        .form-row textarea {
+            resize: vertical;
+            min-height: 55px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+
+        /* BARS */
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .bar-label {
+            width: 90px;
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 7px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .bar-val {
+            width: 70px;
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+        }
+
+        /* MONTHLY */
+        .monthly {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 90px;
+            margin-top: 4px;
+        }
+
+        .m-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .m-bar {
+            width: 100%;
+            border-radius: 2px 2px 0 0;
+            min-height: 3px;
+        }
+
+        .m-lbl {
+            font-size: 10px;
+            color: #888;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            padding: 9px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #fff;
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.25s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            background: #222;
+        }
+
+        .toast.error {
+            background: #c00;
+        }
+
+        /* PAGE SECTIONS */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* MISC */
+        .empty {
+            text-align: center;
+            padding: 2rem;
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .dot-active {
+            background: #1a5c35;
+        }
+
+        .dot-inactive {
+            background: #c00;
+        }
+
+        select.filter {
+            padding: 6px 10px;
+            font-size: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            background: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-top">
+            <div class="sidebar-brand">Zorvyn Finance</div>
+            <div class="sidebar-user" id="sb-email">—</div>
+            <div class="sidebar-role" id="sb-role">—</div>
+        </div>
+
+        <nav id="sidebar-nav">
+            <!-- rendered by JS based on role -->
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button class="btn-logout" onclick="logout()">Sign out</button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <div class="topbar">
+            <h1 id="page-title">Dashboard</h1>
+        </div>
+
+        <div class="content">
+
+            <!-- DASHBOARD -->
+            <div class="page active" id="page-dashboard">
+                <div class="metrics" id="metrics-grid">
+                    <div class="metric">
+                        <div class="metric-label">Total Income</div>
+                        <div class="metric-value green" id="m-income">—</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Total Expense</div>
+                        <div class="metric-value red" id="m-expense">—</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Net Balance</div>
+                        <div class="metric-value blue" id="m-balance">—</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Transactions</div>
+                        <div class="metric-value" id="m-count">—</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Recent Activity</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-tbody">
+                            <tr>
+                                <td colspan="4" class="empty">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TRANSACTIONS -->
+            <div class="page" id="page-transactions">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Transactions</span>
+                        <div style="display:flex;gap:8px;align-items:center">
+                            <select class="filter" id="filter-type" onchange="filterTx()">
+                                <option value="">All types</option>
+                                <option value="INCOME">Income</option>
+                                <option value="EXPENSE">Expense</option>
+                            </select>
+                            <button class="btn btn-dark" id="btn-new-tx" onclick="openModal('modal-create-tx')"
+                                style="display:none">+ New</button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th id="th-act"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tx-tbody">
+                            <tr>
+                                <td colspan="6" class="empty">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ANALYTICS -->
+            <div class="page" id="page-analytics">
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:10px;margin-bottom:1rem">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Summary</span></div>
+                        <div id="ana-summary">
+                            <div class="empty">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">By Category</span></div>
+                        <div id="ana-category">
+                            <div class="empty">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Monthly Net</span></div>
+                    <div class="monthly" id="ana-monthly">
+                        <div class="empty" style="width:100%">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USERS (ADMIN ONLY) -->
+            <div class="page" id="page-users">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Users</span>
+                        <button class="btn btn-dark" onclick="openModal('modal-create-user')">+ New user</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-tbody">
+                            <tr>
+                                <td colspan="3" class="empty">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODAL: CREATE TRANSACTION -->
+    <div class="overlay" id="modal-create-tx">
+        <div class="modal">
+            <h3>New Transaction</h3>
+            <div class="form-row"><label>Amount</label><input type="number" id="tx-amount" placeholder="0.00" min="0"
+                    step="0.01"></div>
+            <div class="form-row"><label>Type</label>
+                <select id="tx-type">
+                    <option value="INCOME">Income</option>
+                    <option value="EXPENSE">Expense</option>
+                </select>
+            </div>
+            <div class="form-row"><label>Category</label><input type="text" id="tx-cat" placeholder="e.g. Revenue, HR">
+            </div>
+            <div class="form-row"><label>Date</label><input type="date" id="tx-date"></div>
+            <div class="form-row"><label>Description</label><textarea id="tx-desc" placeholder="Optional..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('modal-create-tx')">Cancel</button>
+                <button class="btn btn-dark" onclick="createTx()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT TRANSACTION -->
+    <div class="overlay" id="modal-edit-tx">
+        <div class="modal">
+            <h3>Edit Transaction</h3>
+            <input type="hidden" id="edit-tx-id">
+            <div class="form-row"><label>Amount</label><input type="number" id="edit-tx-amount" min="0" step="0.01">
+            </div>
+            <div class="form-row"><label>Type</label>
+                <select id="edit-tx-type">
+                    <option value="INCOME">Income</option>
+                    <option value="EXPENSE">Expense</option>
+                </select>
+            </div>
+            <div class="form-row"><label>Category</label><input type="text" id="edit-tx-cat"></div>
+            <div class="form-row"><label>Date</label><input type="date" id="edit-tx-date"></div>
+            <div class="form-row"><label>Description</label><textarea id="edit-tx-desc"></textarea></div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('modal-edit-tx')">Cancel</button>
+                <button class="btn btn-dark" onclick="updateTx()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CREATE USER (ADMIN) -->
+    <div class="overlay" id="modal-create-user">
+        <div class="modal">
+            <h3>New User</h3>
+            <div class="form-row"><label>Email</label><input type="email" id="nu-email" placeholder="user@zorvyn.com">
+            </div>
+            <div class="form-row"><label>Password</label><input type="password" id="nu-password" placeholder="••••••••">
+            </div>
+            <div class="form-row"><label>Role</label>
+                <select id="nu-role">
+                    <option value="ANALYST">Analyst</option>
+                    <option value="VIEWER">Viewer</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('modal-create-user')">Cancel</button>
+                <button class="btn btn-dark" onclick="createUser()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API = 'http://localhost:8080';
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role') || 'VIEWER';
+        const email = localStorage.getItem('email') || '';
+
+        if (!token) window.location.href = 'login.html';
+
+        let allTx = [];
+        let currentUserId = null;
+        let currentPage = 'dashboard';
+
+        // ── NAV CONFIG per role ──
+        const NAV = {
+            ADMIN: [{ id: 'dashboard', label: 'Dashboard' }, { id: 'transactions', label: 'Transactions' }, { id: 'analytics', label: 'Analytics' }, { id: 'users', label: 'Users' }],
+            ANALYST: [{ id: 'dashboard', label: 'Dashboard' }, { id: 'transactions', label: 'Transactions' }, { id: 'analytics', label: 'Analytics' }],
+            VIEWER: [{ id: 'dashboard', label: 'Dashboard' }, { id: 'transactions', label: 'Transactions' }]
+        };
+
+        function init() {
+            document.getElementById('sb-email').textContent = email;
+            document.getElementById('sb-role').textContent = role;
+            document.getElementById('sb-role').className = 'sidebar-role role-' + role;
+
+            // build nav based on role
+            const nav = NAV[role] || NAV.VIEWER;
+            document.getElementById('sidebar-nav').innerHTML = nav.map(n =>
+                `<a class="nav-item ${n.id === 'dashboard' ? 'active' : ''}" onclick="showPage('${n.id}')" id="nav-${n.id}">${n.label}</a>`
+            ).join('');
+
+            // show new tx button only for admin
+            if (role === 'ADMIN') {
+                document.getElementById('btn-new-tx').style.display = '';
+                document.getElementById('th-act').textContent = 'Actions';
+            }
+
+            // get current user id
+            fetchJson(`${API}/users/all`)
+                .then(users => {
+                    const me = users.find(u => u.email === email);
+                    if (me) currentUserId = me.id;
+                }).catch(() => { });
+
+            loadDashboard();
+        }
+
+        // ── PAGE SWITCHING ──
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+            document.getElementById('nav-' + page).classList.add('active');
+            document.getElementById('page-title').textContent =
+                { dashboard: 'Dashboard', transactions: 'Transactions', analytics: 'Analytics', users: 'Users' }[page];
+            currentPage = page;
+            if (page === 'transactions') loadTx();
+            if (page === 'analytics') loadAnalytics();
+            if (page === 'users') loadUsers();
+        }
+
+        // ── FETCH HELPER ──
+        function fetchJson(url, opts = {}) {
+            return fetch(url, {
+                ...opts,
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, ...(opts.headers || {}) }
+            }).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+        }
+
+        function fetchText(url, opts = {}) {
+            return fetch(url, {
+                ...opts,
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, ...(opts.headers || {}) }
+            }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
+        }
+
+        // ── DASHBOARD ──
+        async function loadDashboard() {
+            try {
+                const d = await fetchJson(`${API}/dashboard/ammountsummary`);
+                document.getElementById('m-income').textContent = fmt(d.income || 0);
+                document.getElementById('m-expense').textContent = fmt(d.expense || 0);
+                document.getElementById('m-balance').textContent = fmt(d.netAmount || 0);
+            } catch (e) { }
+
+            try {
+                const data = await fetchJson(`${API}/dashboard/recent`);
+                document.getElementById('m-count').textContent = data.length;
+                const tbody = document.getElementById('recent-tbody');
+                if (!data.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty">No transactions yet</td></tr>'; return; }
+                tbody.innerHTML = data.map(t => `
+      <tr>
+        <td>${t.descrption || '—'}</td>
+        <td>${t.catagory || '—'}</td>
+        <td><span class="tag tag-${t.type.toLowerCase()}">${t.type}</span></td>
+        <td class="amt-${t.type.toLowerCase()}">${t.type === 'INCOME' ? '+' : '-'}${fmt(t.amount)}</td>
+      </tr>`).join('');
+            } catch (e) { }
+        }
+
+        // ── TRANSACTIONS ──
+        async function loadTx() {
+            try {
+                allTx = await fetchJson(`${API}/transactions/all`);
+                renderTx(allTx);
+            } catch (e) {
+                document.getElementById('tx-tbody').innerHTML = '<tr><td colspan="6" class="empty">Failed to load</td></tr>';
+            }
+        }
+
+        function renderTx(data) {
+            const isAdmin = role === 'ADMIN';
+            const tbody = document.getElementById('tx-tbody');
+            if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">No transactions</td></tr>'; return; }
+            tbody.innerHTML = data.map(t => `
+    <tr>
+      <td>${t.date || '—'}</td>
+      <td>${t.descrption || '—'}</td>
+      <td>${t.catagory || '—'}</td>
+      <td><span class="tag tag-${t.type.toLowerCase()}">${t.type}</span></td>
+      <td class="amt-${t.type.toLowerCase()}">${t.type === 'INCOME' ? '+' : '-'}${fmt(t.amount)}</td>
+      <td>${isAdmin ? `
+        <button class="btn btn-sm btn-edit" onclick="openEditTx(${t.id})">Edit</button>
+        <button class="btn btn-sm btn-delete" onclick="deleteTx(${t.id})" style="margin-left:4px">Delete</button>` : ''}
+      </td>
+    </tr>`).join('');
+        }
+
+        function filterTx() {
+            const type = document.getElementById('filter-type').value;
+            renderTx(type ? allTx.filter(t => t.type === type) : allTx);
+        }
+
+        // create tx
+        function openModal(id) {
+            if (id === 'modal-create-tx') document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById(id).classList.add('open');
+        }
+
+        async function createTx() {
+            const uid = currentUserId || 1;
+            const body = {
+                amount: parseFloat(document.getElementById('tx-amount').value) || 0,
+                type: document.getElementById('tx-type').value,
+                catagory: document.getElementById('tx-cat').value,
+                date: document.getElementById('tx-date').value,
+                descrption: document.getElementById('tx-desc').value
+            };
+            try {
+                await fetchJson(`${API}/transactions/create/${uid}`, { method: 'POST', body: JSON.stringify(body) });
+                closeModal('modal-create-tx');
+                toast('Transaction created');
+                loadTx();
+            } catch (e) { toast('Failed to create', 'error'); }
+        }
+
+        // edit tx
+        function openEditTx(id) {
+            const t = allTx.find(x => x.id === id);
+            if (!t) return;
+            document.getElementById('edit-tx-id').value = id;
+            document.getElementById('edit-tx-amount').value = t.amount;
+            document.getElementById('edit-tx-type').value = t.type;
+            document.getElementById('edit-tx-cat').value = t.catagory || '';
+            document.getElementById('edit-tx-date').value = t.date || '';
+            document.getElementById('edit-tx-desc').value = t.descrption || '';
+            document.getElementById('modal-edit-tx').classList.add('open');
+        }
+
+        async function updateTx() {
+            const id = document.getElementById('edit-tx-id').value;
+            const body = {
+                amount: parseFloat(document.getElementById('edit-tx-amount').value) || 0,
+                type: document.getElementById('edit-tx-type').value,
+                catagory: document.getElementById('edit-tx-cat').value,
+                date: document.getElementById('edit-tx-date').value,
+                descrption: document.getElementById('edit-tx-desc').value
+            };
+            try {
+                await fetchJson(`${API}/transactions/update/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+                closeModal('modal-edit-tx');
+                toast('Transaction updated');
+                loadTx();
+            } catch (e) { toast('Failed to update', 'error'); }
+        }
+
+        async function deleteTx(id) {
+            if (!confirm('Delete this transaction?')) return;
+            try {
+                await fetchText(`${API}/transactions/delete/${id}`, { method: 'DELETE' });
+                toast('Deleted');
+                loadTx();
+            } catch (e) { toast('Failed to delete', 'error'); }
+        }
+
+        // ── ANALYTICS ──
+        async function loadAnalytics() {
+            // summary
+            try {
+                const d = await fetchJson(`${API}/dashboard/ammountsummary`);
+                document.getElementById('ana-summary').innerHTML = `
+      <div style="margin-bottom:10px"><div style="font-size:11px;color:#888;margin-bottom:3px">Income</div><div style="font-size:1.1rem;font-weight:bold;color:#1a5c35">${fmt(d.income || 0)}</div></div>
+      <div style="margin-bottom:10px"><div style="font-size:11px;color:#888;margin-bottom:3px">Expense</div><div style="font-size:1.1rem;font-weight:bold;color:#8b2020">${fmt(d.expense || 0)}</div></div>
+      <div style="border-top:1px solid #eee;padding-top:10px"><div style="font-size:11px;color:#888;margin-bottom:3px">Net Balance</div><div style="font-size:1.2rem;font-weight:bold;color:#1a3a6a">${fmt(d.netAmount || 0)}</div></div>`;
+            } catch (e) { }
+
+            // category
+            try {
+                const d = await fetchJson(`${API}/dashboard/categorywise`);
+                const entries = Object.entries(d).sort((a, b) => b[1] - a[1]);
+                const max = Math.max(...entries.map(e => e[1]), 1);
+                const colors = ['#1a5c35', '#1a3a6a', '#7a3a00', '#3a007a', '#007a7a', '#7a0000'];
+                if (!entries.length) { document.getElementById('ana-category').innerHTML = '<div class="empty">No data</div>'; }
+                else document.getElementById('ana-category').innerHTML = entries.map(([cat, val], i) => `
+      <div class="bar-row">
+        <span class="bar-label">${cat}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round((val / max) * 100)}%;background:${colors[i % colors.length]}"></div></div>
+        <span class="bar-val">${fmt(val)}</span>
+      </div>`).join('');
+            } catch (e) { }
+
+            // monthly
+            try {
+                const d = await fetchJson(`${API}/dashboard/monthlywise`);
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const entries = Object.entries(d).sort((a, b) => +a[0] - +b[0]);
+                const max = Math.max(...entries.map(e => Math.abs(e[1])), 1);
+                if (!entries.length) { document.getElementById('ana-monthly').innerHTML = '<div class="empty" style="width:100%">No data</div>'; }
+                else document.getElementById('ana-monthly').innerHTML = entries.map(([m, v]) => {
+                    const h = Math.round((Math.abs(v) / max) * 80);
+                    return `<div class="m-col">
+        <div class="m-bar" style="height:${h}px;background:${v >= 0 ? '#1a5c35' : '#8b2020'}"></div>
+        <span class="m-lbl">${months[(+m) - 1] || m}</span>
+      </div>`;
+                }).join('');
+            } catch (e) { }
+        }
+
+        // ── USERS ──
+        async function loadUsers() {
+            try {
+                const data = await fetchJson(`${API}/users/all`);
+                if (!data.length) { document.getElementById('users-tbody').innerHTML = '<tr><td colspan="3" class="empty">No users</td></tr>'; return; }
+                document.getElementById('users-tbody').innerHTML = data.map(u => `
+      <tr>
+        <td>${u.email}</td>
+        <td><span class="tag tag-${(u.role || '').toLowerCase()}">${u.role || '—'}</span></td>
+        <td><span class="status-dot dot-${(u.status || '').toLowerCase()}"></span>${u.status || '—'}</td>
+      </tr>`).join('');
+            } catch (e) {
+                document.getElementById('users-tbody').innerHTML = '<tr><td colspan="3" class="empty">Failed to load</td></tr>';
+            }
+        }
+
+        async function createUser() {
+            const body = {
+                email: document.getElementById('nu-email').value.trim(),
+                password: document.getElementById('nu-password').value,
+                role: document.getElementById('nu-role').value   // only ANALYST or VIEWER available in dropdown
+            };
+            if (!body.email || !body.password) { toast('Please fill all fields', 'error'); return; }
+            try {
+                await fetchJson(`${API}/users/create`, { method: 'POST', body: JSON.stringify(body) });
+                closeModal('modal-create-user');
+                toast('User created');
+                loadUsers();
+                // clear fields
+                document.getElementById('nu-email').value = '';
+                document.getElementById('nu-password').value = '';
+            } catch (e) { toast('Failed to create user', 'error'); }
+        }
+
+        // ── UTILS ──
+        function fmt(n) {
+            return '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+        function toast(msg, type = 'success') {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = `toast ${type} show`;
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+
+        // close modal on backdrop click
+        document.querySelectorAll('.overlay').forEach(o => {
+            o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+        });
+
+        init();
+    </script>
+</body>
+
+</html>
