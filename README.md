@@ -165,20 +165,34 @@ cd Finance_Dashboard
 
 ### 3. Configure the database
 
-Update database configuration in:
+This project uses a **local MySQL database** for data persistence.
+
+Before running the application, create a database in MySQL.
+
+Example:
+
+```
+CREATE DATABASE finance_dashboard;
+```
+
+Then update the database configuration in:
 
 ```
 src/main/resources/application.properties
 ```
 
-Example:
+Example configuration:
 
 ```
-spring.datasource.url=jdbc:mysql://localhost:3306/finance_db
+spring.datasource.url=jdbc:mysql://localhost:3306/finance_dashboard
 spring.datasource.username=root
 spring.datasource.password=yourpassword
 spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
 ```
+
+The application will automatically create the required tables when it starts.
+
 
 ### 4. Run the application
 
